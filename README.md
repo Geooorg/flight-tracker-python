@@ -1,2 +1,2 @@
 # flighttracker-python
-some scripts to evaluate flights using Python
+usage: cat flights.json | python3 opensky-json-parser.py
