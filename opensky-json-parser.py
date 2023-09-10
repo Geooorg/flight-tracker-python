@@ -18,4 +18,5 @@ flight_data = data["states"]
 flights = [OpenskyFlight(flight) for flight in flight_data]
 
 # JSON ausgeben
-print(json.dumps([vars(flight) for flight in flights], indent=4))
+result = json.dumps([vars(flight) for flight in flights], indent=1).replace("\n","").replace("\r","").replace("  ", "")
+print(result)
