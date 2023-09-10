@@ -1,2 +1,2 @@
-# flighttracker-python
+# flight-tracker-python
 usage: cat flights.json | python3 opensky-json-parser.py

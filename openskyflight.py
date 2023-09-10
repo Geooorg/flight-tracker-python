@@ -1,5 +1,8 @@
 # Domain-Objekt eines Flugzeug-Status
-class Flight:
+import time
+
+
+class OpenskyFlight:
     def __init__(self, data):
         self.icao = data[0]
         self.callsign = data[1]
@@ -21,4 +24,5 @@ class Flight:
         self.velocity_kmh = (self.velocity * 3.6) if self.velocity is not None else 0
         self.landing = self.velocity < 0 if self.velocity is not None else False
         self.ground = self.velocity = 0
-        # self.squawk = data[14]
+
+        self.created_at = time.time()
