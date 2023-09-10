@@ -1,6 +1,6 @@
 import json
 import sys
-from flight import OpenskyFlight
+from openskyflight import OpenskyFlight
 
 # JSON-Daten von der Standardeingabe mit UTF-8-Codierung lesen
 json_data = sys.stdin.read()
@@ -16,7 +16,6 @@ flight_data = data["states"]
 #
 # # Eine Liste von Flight-Objekten erstellen
 flights = [OpenskyFlight(flight) for flight in flight_data]
-#
-# # Beispiel: Alle Flüge ausgeben
-for flight in flights:
-    print(f"Flug ID: {flight.icao}, Callsign: {flight.callsign}, Höhe: {flight.altitude}, Geschwindigkeit: {flight.velocity_kmh}, Start/Landung? {flight.landing}")
+
+# JSON ausgeben
+print(json.dumps([vars(flight) for flight in flights], indent=4))
