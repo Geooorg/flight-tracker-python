@@ -25,4 +25,4 @@ class OpenskyFlight:
         self.landing = self.velocity < 0 if self.velocity is not None else False
         self.ground = self.velocity = 0
 
-        self.created_at = time.time()
+        self.created_at = round(time.time())
