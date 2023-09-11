@@ -22,7 +22,11 @@ class OpenskyFlight:
 
         self.velocity = data[9] if data[9] is not None else 0
         self.velocity_kmh = (self.velocity * 3.6) if self.velocity is not None else 0
-        self.landing = self.velocity < 0 if self.velocity is not None else False
-        self.ground = self.velocity = 0
 
+        if data[11] < 0: # vertical rate
+            self.landing = True
+        else:
+            self.landing = False
+
+        self.ground = self.velocity == 0
         self.created_at = round(time.time())

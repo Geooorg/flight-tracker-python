@@ -2,21 +2,27 @@ import json
 import sys
 from openskyflight import OpenskyFlight
 
-# JSON-Daten von der Standardeingabe mit UTF-8-Codierung lesen
-json_data = sys.stdin.read()
 
-# Entferne Zeilenumbrüche aus den JSON-Daten
-json_data = ''.join(json_data.splitlines())
+def main():
+    # JSON-Daten von der Standardeingabe mit UTF-8-Codierung lesen
+    json_data = sys.stdin.read()
 
-# JSON-Daten in ein Python-Dictionary umwandeln
-data = json.loads(json_data)
+    # Entferne Zeilenumbrüche aus den JSON-Daten
+    json_data = ''.join(json_data.splitlines())
 
-# Die Liste der Flüge aus den JSON-Daten extrahieren
-flight_data = data["states"]
-#
-# # Eine Liste von Flight-Objekten erstellen
-flights = [OpenskyFlight(flight) for flight in flight_data]
+    # JSON-Daten in ein Python-Dictionary umwandeln
+    data = json.loads(json_data)
 
-# JSON ausgeben
-result = json.dumps([vars(flight) for flight in flights], indent=1).replace("\n","").replace("\r","").replace("  ", "")
-print(result)
+    # Die Liste der Flüge aus den JSON-Daten extrahieren
+    flight_data = data["states"]
+    #
+    # # Eine Liste von Flight-Objekten erstellen
+    flights = [OpenskyFlight(flight) for flight in flight_data]
+
+    # JSON ausgeben
+    result = json.dumps([vars(flight) for flight in flights], indent=1).replace("\n", "").replace("\r", "").replace("  ", "")
+    print(result)
+
+
+if __name__ == '__main__':
+    main()
