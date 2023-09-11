@@ -1,0 +1,20 @@
+### IntelliJ IDEA ###
+.idea
+*.iml
+
+### VSCode ###
+.vscode
+
+### Eclipse
+.settings/
+.classpath
+.project
+
+### Maven ###
+target/
+pom.xml.tag
+venv
+
+# Logging
+*.log*
+.DS_*
