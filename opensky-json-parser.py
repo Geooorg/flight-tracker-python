@@ -16,7 +16,11 @@ def main():
     # Die Liste der Flüge aus den JSON-Daten extrahieren
     flight_data = data["states"]
 
-    # # Eine Liste von Flight-Objekten erstellen
+    if flight_data is None or len(flight_data) == 0:
+        print("[]")
+        sys.exit(0)
+
+    # Eine Liste von Flight-Objekten erstellen
     flights = [OpenskyFlight(flight) for flight in flight_data]
 
     # JSON ausgeben
