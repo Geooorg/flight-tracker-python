@@ -4,8 +4,6 @@ import traceback
 
 import pymongo
 
-from filteredflight import FilteredFlight
-
 db_name = "flight-tracker"
 collection_name_source = "flights-all"
 collection_name_target = "flights-filtered"
@@ -25,20 +23,23 @@ def main():
         cursor = source_collection.find(query_all_unprocessed).limit(50)
 
         for flight in cursor:
-            filtered_flight = FilteredFlight(flight.__dict__)
+            mongo_id = flight["_id"]
+            icao = flight["icao"]
 
-            if not check_existing_processed_flight(filtered_flight.icao, source_collection, db_client):
-                if 0 < filtered_flight.altitude < 5000:
-                    print("inserted flight ", filtered_flight.icao)
+            if not check_existing_processed_flight(icao, source_collection):
+                if 0 < flight["altitude"] < 5000:
+                    print("inserted flight ", icao)
                     try:
-                        target_collection.insert_one(filtered_flight.__dict__)
+                        flight["airport"] = airport_code
+                        target_collection.insert_one(flight)
                     except pymongo.errors.PyMongoError as e:
                         traceback.print_exc()
                         print(f"Fehler beim Einfügen der Datensätze in MongoDB: {e}")
 
             try:
                 flight["processed"] = True
-                source_collection.update_one({"_id": flight["_id"]}, {"$set": {"processed": True}})
+                source_collection.update_one({"_id": mongo_id}, {"$set": {"processed": True}})
+                print("updated ID", mongo_id)
             except pymongo.errors.PyMongoError as e:
                 traceback.print_exc()
                 print(f"Fehler beim Update des Datensatzes in der MongoDB: {e}")
@@ -56,7 +57,7 @@ def main():
         sys.exit(3)
 
 
-def check_existing_processed_flight(icao, db_client, collection):
+def check_existing_processed_flight(icao, collection):
     # Kriterium für die Abfrage
     query = {"icao": icao, "processed": True}
 
