@@ -6,7 +6,7 @@ import traceback
 import pymongo
 
 db_name = "flight-tracker"
-collection_name = "flights-HAM"
+collection_name = "flights-all"
 mongo_url = sys.argv[1]
 
 # JSON-Daten von der Standardeingabe lesen
@@ -23,7 +23,6 @@ try:
         db = db_client[db_name]
         collection = db[collection_name]
 
-        # Versuche, die Datensätze in MongoDB einzufügen
         result = collection.insert_many(flights)
         db_client.close()
 
@@ -35,7 +34,7 @@ try:
 except json.JSONDecodeError as e:
     print(f"Fehler beim Decodieren des JSON: {e}")
     traceback.print_exc()
-    sys.exit(1)  # Beendet das Skript mit dem Fehlercode 1
+    sys.exit(1)
 except pymongo.errors.PyMongoError as e:
     traceback.print_exc()
     print(f"Fehler beim Einfügen der Datensätze in MongoDB: {e}")

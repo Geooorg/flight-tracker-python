@@ -4,6 +4,10 @@ import time
 
 class OpenskyFlight:
     def __init__(self, data):
+        # custom meta data
+        self.created_at = round(time.time())
+
+        # data[i] are derived from the OpenFlight API
         self.icao = data[0]
         self.callsign = data[1]
         self.country = data[2]
@@ -28,5 +32,3 @@ class OpenskyFlight:
             self.landing = True
         else:
             self.landing = False
-
-        self.created_at = round(time.time())
