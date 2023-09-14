@@ -20,7 +20,7 @@ def main():
 
         query_all_unprocessed = {"$or": [{"processed": False}, {"processed": None}]}
 
-        cursor = source_collection.find(query_all_unprocessed).limit(50)
+        cursor = source_collection.find(query_all_unprocessed).limit(100)
 
         for flight in cursor:
             mongo_id = flight["_id"]
