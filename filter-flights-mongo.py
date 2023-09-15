@@ -5,8 +5,8 @@ import traceback
 import pymongo
 
 db_name = "flight-tracker"
-collection_name_source = "flights-all"
-collection_name_target = "flights-filtered"
+source_collection_name = "flights-all"
+target_collection_name = "flights-filtered"
 mongo_url = sys.argv[1]
 airport_code = sys.argv[2]
 
@@ -15,12 +15,12 @@ def main():
     try:
         db_client = pymongo.MongoClient(mongo_url)
         db = db_client[db_name]
-        source_collection = db[collection_name_source]
-        target_collection = db[collection_name_target]
+        source_collection = db[source_collection_name]
+        target_collection = db[target_collection_name]
 
         query_all_unprocessed = {"$or": [{"processed": False}, {"processed": None}, {"processed": ""}]}
 
-        cursor = source_collection.find(query_all_unprocessed).limit(250)
+        cursor = source_collection.find(query_all_unprocessed).limit(1000)
 
         for flight in cursor:
             mongo_id = flight["_id"]
@@ -28,8 +28,9 @@ def main():
             callsign = flight["callsign"]
             if callsign is not None and len(callsign) > 0:
                 callsign = callsign.strip()
+                flight["callsign"] = callsign
 
-            if not check_existing_processed_flight(icao, callsign, source_collection):
+            if not flight_exists_in_target_collection(icao, callsign, target_collection):
                 if 0 < flight["altitude"] < 5000:
                     try:
                         flight["airport"] = airport_code
@@ -39,7 +40,9 @@ def main():
                         traceback.print_exc()
                         print(f"Fehler beim Einfügen der Datensätze in MongoDB: {e}")
                 else:
-                    print("skipped flight", icao, "with callsign", callsign)
+                    print("skipped because not in range: icao =", icao, "callsign =", callsign)
+            else:
+                print("skipped because known: icao =", icao, "callsign = ", callsign)
 
             try:
                 flight["processed"] = True
@@ -62,9 +65,9 @@ def main():
         sys.exit(2)
 
 
-def check_existing_processed_flight(icao, callsign, collection):
-    query = {"icao": icao, "callsign": callsign, "processed": True}
-    existing_flight = collection.find_one(query)
+def flight_exists_in_target_collection(icao, callsign, target_collection):
+    query = {"icao": icao, "callsign": callsign}
+    existing_flight = target_collection.find_one(query)
 
     if existing_flight:
         return True
