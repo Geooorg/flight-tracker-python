@@ -18,23 +18,28 @@ def main():
         source_collection = db[collection_name_source]
         target_collection = db[collection_name_target]
 
-        query_all_unprocessed = {"$or": [{"processed": False}, {"processed": None}]}
+        query_all_unprocessed = {"$or": [{"processed": False}, {"processed": None}, {"processed": ""}]}
 
         cursor = source_collection.find(query_all_unprocessed).limit(100)
 
         for flight in cursor:
             mongo_id = flight["_id"]
             icao = flight["icao"]
+            callsign = flight["callsign"]
+            if callsign is not None and len(callsign) > 0:
+                callsign = callsign.strip()
 
-            if not check_existing_processed_flight(icao, source_collection):
+            if not check_existing_processed_flight(icao, callsign, source_collection):
                 if 0 < flight["altitude"] < 5000:
-                    print("inserted flight ", icao)
                     try:
                         flight["airport"] = airport_code
                         target_collection.insert_one(flight)
+                        print("inserted flight ", icao, " callsign", callsign, " altitude", flight["altitude"])
                     except pymongo.errors.PyMongoError as e:
                         traceback.print_exc()
                         print(f"Fehler beim Einfügen der Datensätze in MongoDB: {e}")
+                else:
+                    print("skipped flight ", icao, " with callsign ", callsign)
 
             try:
                 flight["processed"] = True
@@ -52,19 +57,15 @@ def main():
         traceback.print_exc()
         sys.exit(1)
     except Exception as e:
-        traceback.print_exc()
         print(f"Unerwarteter Fehler: {e}")
-        sys.exit(3)
+        traceback.print_exc()
+        sys.exit(2)
 
 
-def check_existing_processed_flight(icao, collection):
-    # Kriterium für die Abfrage
-    query = {"icao": icao, "processed": True}
-
-    # Suche nach einem Dokument, das dem Kriterium entspricht
+def check_existing_processed_flight(icao, callsign, collection):
+    query = {"icao": icao, "callsign": callsign, "processed": True}
     existing_flight = collection.find_one(query)
 
-    # Überprüfe, ob ein passendes Dokument gefunden wurde
     if existing_flight:
         return True
     else:

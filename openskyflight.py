@@ -9,7 +9,13 @@ class OpenskyFlight:
 
         # data[i] are derived from the OpenFlight API
         self.icao = data[0]
+
         self.callsign = data[1]
+        if self.callsign is not None:
+            self.callsign = self.callsign.strip()
+        else:
+            self.callsign = ""
+
         self.country = data[2]
         self.timestamp_start = data[3]
         self.timestamp_end = data[4]
