@@ -20,7 +20,7 @@ def main():
 
         query_all_unprocessed = {"$or": [{"processed": False}, {"processed": None}, {"processed": ""}]}
 
-        cursor = source_collection.find(query_all_unprocessed).limit(100)
+        cursor = source_collection.find(query_all_unprocessed).limit(250)
 
         for flight in cursor:
             mongo_id = flight["_id"]
@@ -34,12 +34,12 @@ def main():
                     try:
                         flight["airport"] = airport_code
                         target_collection.insert_one(flight)
-                        print("inserted flight ", icao, " callsign", callsign, " altitude", flight["altitude"])
+                        print("inserted flight", icao, "callsign", callsign, "altitude", flight["altitude"])
                     except pymongo.errors.PyMongoError as e:
                         traceback.print_exc()
                         print(f"Fehler beim Einfügen der Datensätze in MongoDB: {e}")
                 else:
-                    print("skipped flight ", icao, " with callsign ", callsign)
+                    print("skipped flight", icao, "with callsign", callsign)
 
             try:
                 flight["processed"] = True
