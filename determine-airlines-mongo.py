@@ -16,7 +16,7 @@ def main():
         db = db_client[db_name]
         target_collection = db[target_collection_name]
 
-        query_all_unprocessed = {"$or": [{"airline": {"$exists": False}}, {"year": ""}]}
+        query_all_unprocessed = {"$or": [{"airline": {"$exists": False}}, {"airline": ""}]}
         cursor = target_collection.find(query_all_unprocessed).limit(1000)
 
         airline_mapper = AirlineMapper()
