@@ -17,7 +17,6 @@ def main():
         db = db_client[db_name]
         target_collection = db[target_collection_name]
 
-        # query_all_unprocessed = {"$or": [{"year": {"$exists": False}}, {"year": None}, {"year": ""}]}
         query_all_unprocessed = {"$or": [{"year": {"$exists": False}}, {"year": ""}]}
         cursor = target_collection.find(query_all_unprocessed).limit(1000)
 

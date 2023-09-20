@@ -5,7 +5,7 @@ class UnixTimestampSplitter:
 
     @staticmethod
     def split_unix_timestamp(timestamp):
-        # Konvertiere den Unix-Timestamp in ein datetime-Objekt
+
         result_tuple = datetime.datetime.fromtimestamp(timestamp, tz=ZoneInfo("Europe/Berlin"))
 
         year = result_tuple.year
