@@ -1,4 +1,3 @@
-# Testklasse für die UnixTimestampSplitter-Klasse
 import unittest
 
 from determine_datetime import UnixTimestampSplitter

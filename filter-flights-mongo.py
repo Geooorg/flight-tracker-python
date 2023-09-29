@@ -20,17 +20,18 @@ def main():
 
         query_all_unprocessed = {"$or": [{"processed": False}, {"processed": None}, {"processed": ""}]}
 
-        cursor = source_collection.find(query_all_unprocessed).limit(1000)
+        cursor = source_collection.find(query_all_unprocessed).limit(100)
 
         for flight in cursor:
             mongo_id = flight["_id"]
             icao = flight["icao"]
             callsign = flight["callsign"]
+            created_at = flight["created_at"]
             if callsign is not None and len(callsign) > 0:
                 callsign = callsign.strip()
                 flight["callsign"] = callsign
 
-            if not flight_exists_in_target_collection(icao, callsign, target_collection):
+            if not flight_exists_in_target_collection(icao, callsign, created_at, target_collection):
                 if 0 < flight["altitude"] < 5000:
                     try:
                         flight["airport"] = airport_code
@@ -65,14 +66,22 @@ def main():
         sys.exit(2)
 
 
-def flight_exists_in_target_collection(icao, callsign, target_collection):
+def flight_exists_in_target_collection(icao, callsign, created_at, target_collection):
     query = {"icao": icao, "callsign": callsign}
-    existing_flight = target_collection.find_one(query)
+    cursor = target_collection.find(query).sort("created_at", -1).limit(1)
 
-    if existing_flight:
-        return True
-    else:
-        return False
+    for existing_flight in cursor:
+        # print(f"existing_flight: {existing_flight}")
+
+        last_seen_seconds = created_at - existing_flight["created_at"]
+        one_day = 60 * 60 * 24 + 1
+        print(f"callsign {callsign} was last_seen before {last_seen_seconds} seconds")
+
+        if last_seen_seconds <= one_day:
+            return True
+        else:
+            print("returning False -> flight will be added")
+            return False
 
 
 if __name__ == '__main__':
